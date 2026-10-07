@@ -1,9 +1,6 @@
-import os
-
 import requests
 
-SLACK_BOT_TOKEN = os.getenv("SLACK_BOT_TOKEN")
-SLACK_CHANNEL = "#leads"
+import config
 
 
 def build_message(lead, company, score, reason, rep):
@@ -22,15 +19,19 @@ def build_message(lead, company, score, reason, rep):
 
 
 def send_to_slack(text):
-    if not SLACK_BOT_TOKEN:
+    if not config.SLACK_BOT_TOKEN:
         print("no SLACK_BOT_TOKEN set, printing message instead:")
         print(text)
         return False
 
     response = requests.post(
         "https://slack.com/api/chat.postMessage",
-        headers={"Authorization": f"Bearer {SLACK_BOT_TOKEN}"},
-        json={"channel": SLACK_CHANNEL, "text": text},
+        headers={"Authorization": f"Bearer {config.SLACK_BOT_TOKEN}"},
+        json={"channel": config.SLACK_CHANNEL, "text": text},
+        timeout=10,
     )
-    print(response.json())
+    data = response.json()
+    if not data.get("ok"):
+        print("slack error:", data.get("error"))
+        return False
     return True

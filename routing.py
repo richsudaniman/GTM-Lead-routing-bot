@@ -1,21 +1,15 @@
-REPS = {
-    "enterprise": {"name": "Avery Chen", "slack_id": "U0000000001"},
-    "mid_market": {"name": "Riley Nguyen", "slack_id": "U0000000004"},
-    "smb": {"name": "Jalal Abdelrahim", "slack_id": "U0BEA0YPSL9"},
-}
-
-MIN_SCORE = 50
+import config
 
 
 def pick_rep(company, score):
     """Pick a rep based on company size. Returns None if the lead isn't good enough."""
-    if score < MIN_SCORE:
+    if score < config.MIN_SCORE:
         return None
 
     employees = company["employees"]
     if employees >= 1000:
-        return REPS["enterprise"]
+        return config.REPS["enterprise"]
     elif employees >= 200:
-        return REPS["mid_market"]
+        return config.REPS["mid_market"]
     else:
-        return REPS["smb"]
+        return config.REPS["smb"]
