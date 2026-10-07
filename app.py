@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 
 from enrichment import get_company
+from routing import pick_rep
 from scoring import score_lead
 from slack import build_message, send_to_slack
 
@@ -29,11 +30,12 @@ def webhook():
     lead = parse_form(data)
     company = get_company(lead["domain"])
     score, reason = score_lead(lead, company)
+    rep = pick_rep(company, score)
 
-    message = build_message(lead, company, score, reason)
+    message = build_message(lead, company, score, reason, rep)
     send_to_slack(message)
 
-    return jsonify({"score": score, "reason": reason})
+    return jsonify({"score": score, "rep": rep["name"] if rep else None})
 
 
 if __name__ == "__main__":

@@ -6,9 +6,14 @@ SLACK_BOT_TOKEN = os.getenv("SLACK_BOT_TOKEN")
 SLACK_CHANNEL = "#leads"
 
 
-def build_message(lead, company, score, reason):
+def build_message(lead, company, score, reason, rep):
+    if rep:
+        assigned = f"<@{rep['slack_id']}>"
+    else:
+        assigned = "no rep (sending to nurture)"
+
     return (
-        f"*New lead: {lead['name']} @ {company['name']}*\n"
+        f"*New lead: {lead['name']} @ {company['name']}* → {assigned}\n"
         f"*Score:* {score}/100 ({reason})\n"
         f"*Company:* {company['industry']}, {company['employees']} employees, {company['country']}\n"
         f"*Title:* {lead['title']}\n"
