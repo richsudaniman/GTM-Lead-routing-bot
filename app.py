@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, request
 
+from enrichment import get_company
+
 app = Flask(__name__)
 
 
@@ -23,8 +25,9 @@ def parse_form(data):
 def webhook():
     data = request.get_json()
     lead = parse_form(data)
-    print(lead)
-    return jsonify(lead)
+    company = get_company(lead["domain"])
+    print(lead, company)
+    return jsonify({"lead": lead, "company": company})
 
 
 if __name__ == "__main__":
