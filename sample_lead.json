@@ -1,0 +1,10 @@
+{
+  "conversionId": "test-lead-1",
+  "fields": [
+    {"name": "email", "value": "nora.weiss@routewise.io"},
+    {"name": "firstname", "value": "Nora"},
+    {"name": "lastname", "value": "Weiss"},
+    {"name": "jobtitle", "value": "Head of Sales"},
+    {"name": "message", "value": "Hi, we want to automate how we route leads to our sales team."}
+  ]
+}
