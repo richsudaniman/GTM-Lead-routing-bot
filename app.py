@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 
 from enrichment import get_company
+from scoring import score_lead
 
 app = Flask(__name__)
 
@@ -26,8 +27,9 @@ def webhook():
     data = request.get_json()
     lead = parse_form(data)
     company = get_company(lead["domain"])
-    print(lead, company)
-    return jsonify({"lead": lead, "company": company})
+    score, reason = score_lead(lead, company)
+    print(lead["email"], score, reason)
+    return jsonify({"score": score, "reason": reason})
 
 
 if __name__ == "__main__":
