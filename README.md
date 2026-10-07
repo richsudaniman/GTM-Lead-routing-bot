@@ -2,6 +2,27 @@
 
 A small Flask app that takes new leads from a HubSpot form, scores them, and posts them in Slack tagged to the right sales rep.
 
+## The problem
+
+At a lot of B2B companies, inbound leads get routed by hand. Someone in sales ops checks HubSpot, decides whether the lead is any good, figures out who should own it, and messages that rep. That causes a few problems:
+
+- **Leads wait.** If nobody checks HubSpot for a few hours, or over a weekend, a person who just asked for a demo sits there with no reply. The longer a lead waits, the less likely it is to turn into a meeting, and by then they may have talked to a competitor.
+- **Reps waste time on bad leads.** Students, job seekers and people with gmail addresses come through the same form as real buyers. Reps either sort through them by hand or ignore the inbox.
+- **Routing isn't fair or consistent.** Whoever grabs the lead first gets it, or it depends on who did the routing that day. Big accounts can land with the wrong team.
+- **No record of why.** When a rep asks "why did I get this lead?" or a good lead slipped through, there's nothing to look back at.
+
+## How this solves it
+
+| Problem | What the bot does |
+|---|---|
+| Leads wait for someone to route them | Routes every lead the moment the form is submitted and posts it straight to Slack, where reps already are |
+| Reps waste time on bad leads | Scores each lead against the ideal customer profile (Claude, or simple rules), so personal emails and bad fits get no rep and go to marketing nurture instead |
+| Routing isn't consistent | Uses the same rules every time: enterprise, mid-market or SMB rep based on company size |
+| The right rep doesn't notice | @mentions the assigned rep in the Slack post, with the score and the reason, so they know why it's worth their time |
+| No record of why | Logs every decision (score, reason, rep) to `decisions.log` |
+| HubSpot sends the same form twice | Skips duplicates so a lead is never routed twice |
+| Slack or Claude has a hiccup | Retries the call so leads don't get dropped |
+
 ## Screenshots
 
 The Slack message a rep gets (the rep is @mentioned):
