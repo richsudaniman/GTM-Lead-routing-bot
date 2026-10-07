@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, jsonify, request
 
 from enrichment import get_company
@@ -6,6 +8,8 @@ from scoring import score_lead
 from slack import build_message, send_to_slack
 
 app = Flask(__name__)
+
+PROCESSED_FILE = "processed_leads.txt"
 
 
 def parse_form(data):
@@ -16,6 +20,7 @@ def parse_form(data):
 
     email = fields.get("email", "").strip().lower()
     return {
+        "id": data.get("conversionId") or email,
         "email": email,
         "name": (fields.get("firstname", "") + " " + fields.get("lastname", "")).strip(),
         "title": fields.get("jobtitle", ""),
@@ -24,11 +29,27 @@ def parse_form(data):
     }
 
 
+def already_processed(lead_id):
+    if not os.path.exists(PROCESSED_FILE):
+        return False
+    with open(PROCESSED_FILE) as f:
+        return lead_id in f.read().splitlines()
+
+
+def mark_processed(lead_id):
+    with open(PROCESSED_FILE, "a") as f:
+        f.write(lead_id + "\n")
+
+
 def handle_lead(data):
     lead = parse_form(data)
 
     if not lead["domain"]:
         return {"status": "skipped", "reason": "no valid email"}
+
+    if already_processed(lead["id"]):
+        print("already handled this lead, skipping:", lead["id"])
+        return {"status": "duplicate"}
 
     company = get_company(lead["domain"])
     score, reason = score_lead(lead, company)
@@ -36,6 +57,8 @@ def handle_lead(data):
 
     message = build_message(lead, company, score, reason, rep)
     send_to_slack(message)
+
+    mark_processed(lead["id"])
 
     return {"status": "done", "score": score, "rep": rep["name"] if rep else None}
 
