@@ -4,12 +4,16 @@ import requests
 
 import config
 
+FREE_EMAILS = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "icloud.com"]
 GOOD_INDUSTRIES = ["SaaS", "Software", "Fintech", "Logistics"]
 SENIOR_WORDS = ["head", "vp", "director", "chief", "founder"]
 
 
 def score_lead(lead, company):
     """Returns (score from 0-100, reason)"""
+    if lead["domain"] in FREE_EMAILS:
+        return 0, "personal email"
+
     if config.ANTHROPIC_API_KEY:
         try:
             return score_with_claude(lead, company)
