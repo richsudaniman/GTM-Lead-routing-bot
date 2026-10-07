@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 from datetime import datetime
 
 from flask import Flask, jsonify, request
@@ -98,4 +99,9 @@ def webhook():
 
 
 if __name__ == "__main__":
-    app.run(port=5000, debug=True)
+    # run with a json file to test without hubspot: python app.py sample_lead.json
+    if len(sys.argv) > 1:
+        with open(sys.argv[1]) as f:
+            print(handle_lead(json.load(f)))
+    else:
+        app.run(port=5000, debug=True)
