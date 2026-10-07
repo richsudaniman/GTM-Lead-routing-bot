@@ -1,6 +1,7 @@
 import requests
 
 import config
+from utils import retry
 
 
 def build_message(lead, company, score, reason, rep):
@@ -24,14 +25,16 @@ def send_to_slack(text):
         print(text)
         return False
 
-    response = requests.post(
-        "https://slack.com/api/chat.postMessage",
-        headers={"Authorization": f"Bearer {config.SLACK_BOT_TOKEN}"},
-        json={"channel": config.SLACK_CHANNEL, "text": text},
-        timeout=10,
-    )
-    data = response.json()
-    if not data.get("ok"):
-        print("slack error:", data.get("error"))
-        return False
+    def post():
+        response = requests.post(
+            "https://slack.com/api/chat.postMessage",
+            headers={"Authorization": f"Bearer {config.SLACK_BOT_TOKEN}"},
+            json={"channel": config.SLACK_CHANNEL, "text": text},
+            timeout=10,
+        )
+        data = response.json()
+        if not data.get("ok"):
+            raise Exception(f"slack error: {data.get('error')}")
+
+    retry(post)
     return True
