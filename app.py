@@ -1,4 +1,6 @@
+import json
 import os
+from datetime import datetime
 
 from flask import Flask, jsonify, request
 
@@ -10,6 +12,7 @@ from slack import build_message, send_to_slack
 app = Flask(__name__)
 
 PROCESSED_FILE = "processed_leads.txt"
+LOG_FILE = "decisions.log"
 
 
 def parse_form(data):
@@ -41,6 +44,21 @@ def mark_processed(lead_id):
         f.write(lead_id + "\n")
 
 
+def log_decision(lead, company, score, reason, rep):
+    entry = {
+        "time": datetime.now().isoformat(timespec="seconds"),
+        "lead_id": lead["id"],
+        "email": lead["email"],
+        "company": company["name"],
+        "employees": company["employees"],
+        "score": score,
+        "reason": reason,
+        "rep": rep["name"] if rep else None,
+    }
+    with open(LOG_FILE, "a") as f:
+        f.write(json.dumps(entry) + "\n")
+
+
 def handle_lead(data):
     lead = parse_form(data)
 
@@ -58,6 +76,7 @@ def handle_lead(data):
     message = build_message(lead, company, score, reason, rep)
     send_to_slack(message)
 
+    log_decision(lead, company, score, reason, rep)
     mark_processed(lead["id"])
 
     return {"status": "done", "score": score, "rep": rep["name"] if rep else None}
