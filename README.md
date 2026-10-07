@@ -2,6 +2,20 @@
 
 A small Flask app that takes new leads from a HubSpot form, scores them, and posts them in Slack tagged to the right sales rep.
 
+## Screenshots
+
+The Slack message a rep gets (the rep is @mentioned):
+
+<img src="screenshots/slack-message.png" alt="Slack message for a new lead with the score, company info, and the assigned rep tagged" width="450">
+
+Running the sample lead with no API keys set, and the decision that got logged:
+
+<img src="screenshots/run-sample-lead.png" alt="Terminal output from python app.py sample_lead.json and the decisions.log entry" width="700">
+
+Tests:
+
+<img src="screenshots/tests.png" alt="pytest output with 10 tests passing" width="700">
+
 ## How it works
 
 1. HubSpot sends the form submission to `/webhook`.
